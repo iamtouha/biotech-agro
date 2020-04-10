@@ -1,5 +1,9 @@
 <template>
-  <div class="about">
-    <h1>This is an about page</h1>
-  </div>
+  <helloWorld />
 </template>
+<script>
+import helloWorld from "@/components/HelloWorld.vue";
+export default {
+  components: { helloWorld: helloWorld }
+};
+</script>
