@@ -1,65 +1,10 @@
 <template>
   <v-container fluid>
-    <v-container>
-      <v-row>
-        <v-col cols="6" sm="4">
-          Total cash:
-          <h1 class="display-1">
-            {{ totalCash }}
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-        <v-col cols="6" sm="4">
-          Paid Cash:
-          <h1 class="display-1">
-            {{ cashPaid }}
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-        <v-col cols="6" sm="4">
-          Due Cash:
-          <h1 v-if="totalCash - cashPaid >= 0" class="display-1">
-            {{ totalCash - cashPaid }}
-            <span style="font-size:18px;">tk</span>
-          </h1>
-          <h1 v-else class="display-1">
-            0
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-        <v-col cols="6" sm="4">
-          Total credit:
-          <h1 class="display-1">
-            {{ totalCredit }}
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-        <v-col cols="6" sm="4">
-          Paid Credit:
-          <h1 class="display-1">
-            {{ creditPaid }}
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-        <v-col v-if="totalCredit - creditPaid >= 0" cols="6" sm="4">
-          Due Credit:
-          <h1 class="display-1">
-            {{ totalCredit - creditPaid }}
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-        <v-col v-else cols="6" sm="4">
-          Due Credit:
-          <h1 class="display-1">
-            0
-            <span style="font-size:18px;">tk</span>
-          </h1>
-        </v-col>
-      </v-row>
-    </v-container>
     <v-row>
       <v-col cols="12">
         <v-data-table
+          dense
+          items-per-page="20"
           :loading="loader"
           sort-by
           :headers="Headers"
@@ -69,37 +14,48 @@
             <v-toolbar flat color="white">
               <v-toolbar-title>Overview</v-toolbar-title>
               <v-divider class="mx-4" inset vertical></v-divider>
-              <v-row>
-                <v-col class="pa-0 py-1 py-sm-0" cols="12" sm="5">
-                  from:
-                  <Datefield @changedVal="setStart" :value="startDate" />
-                </v-col>
-                <v-col class="pa-0 py-1 py-sm-0" cols="8" sm="5">
-                  to:
-                  <Datefield @changedVal="setEnd" :value="endDate" />
-                </v-col>
-                <v-col class="pa-0 py-1 py-sm-0" cols="2">
-                  <v-btn class="primary" @click="fetchOverviews(range)">
-                    <v-icon>mdi-magnify</v-icon>
-                  </v-btn>
-                </v-col>
-              </v-row>
+              <Datefield
+                field="from"
+                @changedVal="setStart"
+                :value="startDate"
+              />
+              <Datefield field="to" @changedVal="setEnd" />
+              <v-btn
+                v-if="!printMode"
+                tile
+                small
+                elevation="0"
+                class="primary"
+                @click="fetchOverviews(range)"
+              >
+                <v-icon>mdi-magnify</v-icon>
+              </v-btn>
             </v-toolbar>
           </template>
           <template v-slot:item.dealer="{ item }"
             >{{ item.dealer.code }}. {{ item.dealer.name }}</template
           >
           <template v-slot:item.credit_payable="{ item }">
-            <span v-if="item.total_credit - item.credit_paid >= 0">{{
-              Math.round(item.total_credit - item.credit_paid)
-            }}</span>
-            <span v-else>0</span>
+            <span>{{ Math.round(item.total_credit - item.credit_paid) }}</span>
           </template>
           <template v-slot:item.cash_payable="{ item }">
-            <span v-if="item.total_cash - item.cash_paid >= 0">{{
-              Math.round(item.total_cash - item.cash_paid)
-            }}</span>
-            <span v-else>0</span>
+            <span>{{ Math.round(item.total_cash - item.cash_paid) }}</span>
+          </template>
+          <template v-slot:body.append>
+            <tr>
+              <td class="font-weight-bold">Paid Cash: {{ cashPaid }}tk</td>
+              <td class="font-weight-bold">Total Cash: {{ totalCash }}tk</td>
+              <td class="font-weight-bold">
+                Due Cash: {{ totalCash - cashPaid }}tk
+              </td>
+              <td class="font-weight-bold">
+                Total credit: {{ totalCredit }}tk
+              </td>
+              <td class="font-weight-bold">Paid Credit: {{ creditPaid }}tk</td>
+              <td class="font-weight-bold">
+                Due Credit: {{ totalCredit - creditPaid }}tk
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-col>
@@ -108,8 +64,9 @@
 </template>
 
 <script>
-import firebase from "../firebaseConfig";
+import firebase from "@/firebaseConfig";
 import Datefield from "../components/Datefield";
+import { mapGetters } from "vuex";
 const db = firebase.firestore();
 export default {
   components: {
@@ -123,12 +80,7 @@ export default {
       end: null
     },
     Headers: [
-      {
-        text: "Dealer",
-        align: "left",
-        sortable: false,
-        value: "dealer"
-      },
+      { text: "Dealer", align: "left", value: "dealer" },
       { text: "Total Cash", value: "total_cash" },
       { text: "Cash Paid", value: "cash_paid" },
       { text: "Due Cash", value: "cash_payable" },
@@ -140,6 +92,7 @@ export default {
   }),
 
   computed: {
+    ...mapGetters(["printMode"]),
     startDate() {
       let time = new Date();
       time = time.setMonth(time.getMonth() - 1);

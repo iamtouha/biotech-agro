@@ -28,16 +28,16 @@
           <v-list-item-avatar>
             <v-img v-if="userState.image" :src="userState.image"></v-img>
             <v-avatar color="primary" v-else>
-              <v-icon v-if="userState.name" dark text>{{
-                userState.name.slice(0, 1)
-              }}</v-icon>
+              <v-icon v-if="userState.name" dark text>
+                {{ userState.name.slice(0, 1) }}
+              </v-icon>
             </v-avatar>
           </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{ userState.name }}</v-list-item-title>
-            <v-list-item-subtitle>
-              {{ userState.designation }}
-            </v-list-item-subtitle>
+            <v-list-item-subtitle>{{
+              userState.designation
+            }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
@@ -114,60 +114,42 @@ export default {
     drawer: null,
     links: [
       { icon: "mdi-home", title: "home", route: "/" },
-      { icon: "mdi-home", title: "statement", route: "/statement" },
       { icon: "mdi-spray-bottle", title: "Products", route: "/products" },
       {
-        icon: "mdi-warehouse",
-        title: "Stock",
-        route: "/stock"
+        icon: "mdi-sign-real-estate",
+        title: "product statement",
+        route: "/statement"
       },
-      {
-        icon: "mdi-playlist-check",
-        title: "Challan",
-        route: "/challan"
-      },
+      { icon: "mdi-warehouse", title: "Stock", route: "/stock" },
+      { icon: "mdi-playlist-check", title: "Challan", route: "/challan" },
       { icon: "mdi-store", title: "Dealers", route: "/dealers" },
       {
         icon: "mdi-cash-multiple",
         title: "Transactions",
         route: "/transactions"
       },
-      {
-        icon: "mdi-playlist-plus",
-        title: "Orders",
-        route: "/orders"
-      },
+      { icon: "mdi-playlist-plus", title: "Orders", route: "/orders" },
       {
         icon: "mdi-format-list-bulleted",
         title: "Invoices",
         route: "/invoices"
       },
-      {
-        icon: "mdi-information",
-        title: "About",
-        route: "/about"
-      }
+      { icon: "mdi-information", title: "About", route: "/about" }
     ],
     hideNavFor: ["inv-print", "login"],
-    hideBarFor: ["inv-print"]
+    hideBarFor: ["inv-print", "login"]
   }),
   computed: {
     ...mapGetters(["userState", "printMode"]),
     loggedIn() {
       return firebase.auth().currentUser;
     },
-    imageRef() {
-      return firebase.storage().refFromURL(this.userState.image);
-    },
+
     app() {
       return { version, name };
     }
   },
-  mounted() {
-    this.imageRef.getDownloadURL().then(v => {
-      console.log(v);
-    });
-  },
+  mounted() {},
   methods: {
     ...mapActions(["printScr"]),
     signout() {

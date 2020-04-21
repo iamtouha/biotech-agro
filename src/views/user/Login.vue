@@ -1,37 +1,39 @@
 <template>
-  <v-container>
-    <v-progress-circular
-      class="loader"
-      v-if="loader"
-      :size="50"
-      color="primary"
-      indeterminate
-    ></v-progress-circular>
-    <v-layout row wrap>
-      <v-flex xs12 sm6 offset-sm3 class="px-4 py-3 mt-5">
-        <v-form>
-          <v-text-field
-            type="email"
-            outlined
-            v-model="credentials.email"
-            label="e-mail"
-            required
-          ></v-text-field>
-          <v-text-field
-            outlined
-            v-model="credentials.password"
-            label="password"
-            type="password"
-            required
-          ></v-text-field>
-          <v-snackbar v-model="alert" bottom>
-            {{ error }}
-            <v-btn text @click="dismiss()">Close</v-btn>
-          </v-snackbar>
-          <v-btn @click="signin()">Log in</v-btn>
-        </v-form>
-      </v-flex>
-    </v-layout>
+  <v-container class="fill-height">
+    <v-row justify="center" align="center">
+      <v-col cols="12" sm="6">
+        <v-card elevation="3" class="full-width">
+          <v-card-title>Login to biotech agrovat</v-card-title>
+          <v-card-text class="pb-0">
+            <v-form>
+              <v-text-field
+                type="email"
+                outlined
+                v-model="credentials.email"
+                label="e-mail"
+                required
+              ></v-text-field>
+              <v-text-field
+                outlined
+                v-model="credentials.password"
+                label="password"
+                type="password"
+                required
+              ></v-text-field>
+              <v-snackbar v-model="alert" bottom>
+                {{ error }}
+                <v-btn text @click="dismiss()">Close</v-btn>
+              </v-snackbar>
+            </v-form>
+          </v-card-text>
+          <v-card-actions class="pt-0">
+            <v-btn large :loading="loader" class="primary" @click="signin()"
+              >Log in</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 <script>
